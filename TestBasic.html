@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="">
+    <title>Basic GameLoop</title>
+</head>
+<body>
+
+    <canvas id="rectCanvas" width="800" height="600"></canvas>
+    
+    <script>
+            'use strict'
+
+        /** setup for requestAnimationFrame by Paul Irish*/
+        if(!window.requestAnimationFrame){
+            window.requestAnimationFrame = window.webkitRequestAnimationFrame||
+                                            window.mozRequestAnimationFrame ||
+                                            window.oRequestAnimationFrame ||
+                                            window.msRequestAnimationFrame ||
+                                            function(callback, element){
+                                                window.setTimeout(callback, 1000/60);
+                                            }
+        }
+
+        /** Timing */
+        function gTime(){
+            return window.performance && window.performance.now() ? window.performance.now() : new Date().getTime();
+        }
+
+        /** Initializing the game */
+        let Game = {
+            c : undefined,
+            ctx : undefined,
+            rectPos : 0
+        }
+
+        /** Prep. for canvas Clearing */
+        Game.clearCanvas = function() {
+            Game.ctx.clearRect(0, 0, Game.c.width, Game.c.height);
+        } // end fn clearCanvas
+
+        Game.update = function(){
+            Game.rectPos  = gTime() % Game.c.width;
+        }// end fn update
+
+        Game.draw = function() {
+            Game.ctx.fillStyle = "blue";
+            Game.ctx.rotate(30 * Math.PI / 180);
+            Game.ctx.fillRect (Game.rectPos, 100, 50, 50);
+
+            Game.ctx.setTransform(1,0,0, 1,0,0);
+        } // end fn draw
+
+        Game.mainLoop  = function() {
+            Game.clearCanvas();
+            Game.update();
+            Game.draw();
+            window.requestAnimationFrame(Game.mainLoop);
+        } // end fn mainLoop
+
+        Game.start = function() {
+            document.body.style.background = "#222";
+            Game.c = document.getElementById("rectCanvas");
+            Game.ctx = Game.c.getContext("2d");
+
+            Game.c.style.backgroundColor = "#ddd";
+
+            // start the first Frame
+            Game.mainLoop();
+
+        } // end fn start
+
+        // start Game if DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', Game.start);
+        
+    </script>
+</body>
+</html>
